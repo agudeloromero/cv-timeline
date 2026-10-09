@@ -40,27 +40,6 @@ Uploading a file only changes what *you* see in your browser. To change what eve
 
 ---
 
-## Publishing on GitHub Pages
-
-### First-time setup
-
-1. Sign in to GitHub and click **New repository**. Name it, for example, `cv-timeline`.
-2. In the new repository, click **Add file → Upload files** and drag in `index.html`, `cv.tsv`, `README.md` and `screenshot.png`. Click **Commit changes**.
-3. Go to **Settings → Pages**.
-4. Under **Build and deployment**, set **Source** to *Deploy from a branch*, choose branch **main** and folder **/ (root)**, then click **Save**.
-5. Wait one or two minutes, then refresh the page. GitHub shows the address of your site: `https://<your-username>.github.io/<repository-name>/`.
-
-### Updating your timeline
-
-- **In the browser:** open `cv.tsv` in the repository, click the ✏️ pencil icon, make your changes and click **Commit changes**. If you edit on GitHub, keep the tabs between columns. It's usually easier to edit in a spreadsheet and re-upload.
-- **By replacing the file:** click **Add file → Upload files**, drop in your new `cv.tsv` (keep exactly that name) and commit. It replaces the old one.
-
-The live page updates within a minute or two. If you still see the old version, do a hard refresh (Ctrl + Shift + R on Windows, Cmd + Shift + R on Mac).
-
-> **Privacy note:** in a public repository, anyone with the link can read `cv.tsv`. Only include what you would put on a public CV. You can still use the page privately: leave `cv.tsv` as a generic example and upload your real file locally each time.
-
----
-
 ## Preparing your TSV file
 
 The first row must be the header. Column order doesn't matter, and column names are not case-sensitive.
