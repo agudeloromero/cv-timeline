@@ -162,4 +162,16 @@ If a row can't be read (for example a date written as `Feb 2018`), the page skip
 | `screenshot.png` | Image used in this README |
 | `README.md` | This guide |
 
+---
+
+## Questions & feedback
+
+Have a question, found a bug, or have an idea to make this better? I'd be happy to hear from you.
+
+- 💬 **Open an issue:** [github.com/agudeloromero/cv-timeline/issues](https://github.com/agudeloromero/cv-timeline/issues/new). This is best for bugs and feature requests, because others can see and join the discussion.
+- ✉️ **Send me an email:** [p.agudeloromero@gmail.com](mailto:p.agudeloromero@gmail.com?subject=CV%20Timeline%20feedback)
+
+Suggestions for improvement are always welcome.
+
 Built with plain HTML, CSS and JavaScript. Fonts come from [IBM Plex Sans](https://fonts.google.com/specimen/IBM+Plex+Sans) via Google Fonts.
+
