@@ -97,7 +97,7 @@ Lines beginning with `#` are ignored, so you can hide a row by putting `#` at it
 
 This is what the example `cv.tsv` looks like when opened in Excel:
 
-![Example cv.tsv opened in Excel](spreadsheet-example.jpg)
+![Example cv.tsv opened in Excel](cv.jpg)
 
 ### Saving as TSV
 
