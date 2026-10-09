@@ -6,7 +6,7 @@ Turn a simple spreadsheet of your career into a timeline of concurrent roles: on
 
 *The example data (`cv.tsv`) describes a fictional researcher, "Dr John Smith". All people, institutions and numbers in it are made up. Replace it with your own.*
 
-**Live page:** https://agudeloromero.github.io/cv-timeline/ *(update this link if your username or repository name is different)*
+**Live page:** https://agudeloromero.github.io/cv-timeline/
 
 - 📄 Works from a plain tab-separated (`.tsv`) file that you can edit in Excel or Google Sheets
 - 🔒 Runs entirely in your browser. Uploaded files are never sent to a server.
@@ -37,27 +37,6 @@ Turn a simple spreadsheet of your career into a timeline of concurrent roles: on
 6. Click **Save PNG**, **Save SVG** or **Print / PDF** to export your timeline.
 
 Uploading a file only changes what *you* see in your browser. To change what everyone sees at the public link, update `cv.tsv` in the repository (below).
-
----
-
-## Publishing on GitHub Pages
-
-### First-time setup
-
-1. Sign in to GitHub and click **New repository**. Name it, for example, `cv-timeline`.
-2. In the new repository, click **Add file → Upload files** and drag in `index.html`, `cv.tsv`, `README.md` and `screenshot.png`. Click **Commit changes**.
-3. Go to **Settings → Pages**.
-4. Under **Build and deployment**, set **Source** to *Deploy from a branch*, choose branch **main** and folder **/ (root)**, then click **Save**.
-5. Wait one or two minutes, then refresh the page. GitHub shows the address of your site: `https://<your-username>.github.io/<repository-name>/`.
-
-### Updating your timeline
-
-- **In the browser:** open `cv.tsv` in the repository, click the ✏️ pencil icon, make your changes and click **Commit changes**. If you edit on GitHub, keep the tabs between columns. It's usually easier to edit in a spreadsheet and re-upload.
-- **By replacing the file:** click **Add file → Upload files**, drop in your new `cv.tsv` (keep exactly that name) and commit. It replaces the old one.
-
-The live page updates within a minute or two. If you still see the old version, do a hard refresh (Ctrl + Shift + R on Windows, Cmd + Shift + R on Mac).
-
-> **Privacy note:** in a public repository, anyone with the link can read `cv.tsv`. Only include what you would put on a public CV. You can still use the page privately: leave `cv.tsv` as a generic example and upload your real file locally each time.
 
 ---
 
