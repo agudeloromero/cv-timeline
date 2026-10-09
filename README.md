@@ -76,6 +76,22 @@ Special categories, starting with an underscore, fill the coloured banner instea
 
 You can add as many `_metric` rows as fit. Three to five works best.
 
+### Adding your own categories
+
+You aren't limited to the example categories. Any new name in the `category` column becomes its own lane:
+
+| category | label | org | start | end |
+|---|---|---|---|---|
+| Teaching | Lecturer, Metagenomics unit | Northbridge University | 2019 | present |
+| Grants | Project Grant (CI-A) | National Science Fund | 2021 | 2024 |
+| Supervision | PhD student: A. Lee | Northbridge University | 2020 | 2024 |
+
+- **Order:** lanes appear in the order each category first occurs in the file. Move rows in your spreadsheet to reorder them.
+- **Spelling must match exactly.** "Grants" and "Grant" become two separate lanes.
+- **Colours:** there are 7 built-in lane colours, which repeat from the 8th lane. To choose your own, add a hex code (e.g. `#5B6B2E`) in the `color` column of a lane's first row.
+- **Dated or undated:** rows with a `start` date are drawn as bars on the timeline. Rows without one become chips under the timeline, grouped by category.
+- **Size:** the page grows to fit. For slides, about 8 lanes or 40 bars is a comfortable maximum.
+
 ### Example
 
 ```tsv
