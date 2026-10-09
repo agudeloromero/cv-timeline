@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CV Timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap">
+<style>
+  :root { --ink:#1E2326; --muted:#5A6168; --line:#E3E6E9; --bg:#F4F5F6; --accent:#12403C; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans', system-ui, sans-serif; }
+  header.bar { display:flex; flex-wrap:wrap; gap:12px; align-items:center; padding:14px 24px; background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:2; }
+  header.bar h1 { font-size:16px; margin:0 12px 0 0; font-weight:700; }
+  .btn { display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 14px; border:1px solid #C9CED3; border-radius:8px; background:#fff; color:var(--ink); font:inherit; font-size:14px; cursor:pointer; text-decoration:none; }
+  .btn:hover { background:#F1F3F4; }
+  .btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .btn.primary:hover { filter:brightness(1.15); }
+  label.inline { display:inline-flex; align-items:center; gap:6px; font-size:14px; color:var(--muted); }
+  input[type=color] { width:36px; height:36px; border:1px solid #C9CED3; border-radius:8px; padding:2px; background:#fff; }
+  .spacer { flex:1; }
+  #drop { margin:20px 24px 0; padding:16px; border:2px dashed #C9CED3; border-radius:12px; text-align:center; color:var(--muted); font-size:14px; }
+  #drop.over { border-color:var(--accent); background:#fff; color:var(--ink); }
+  #msg { margin:12px 24px 0; font-size:14px; }
+  #msg.err { color:#A1281A; }
+  #msg ul { margin:6px 0 0; padding-left:20px; }
+  #stage { margin:20px 24px 40px; overflow-x:auto; background:#fff; border:1px solid var(--line); border-radius:12px; }
+  #stage svg { display:block; width:100%; height:auto; min-width:900px; }
+  input[type=file] { display:none; }
+  @media print {
+    @page { size: landscape; margin: 8mm; }
+    header.bar, #drop, #msg { display:none; }
+    body { background:#fff; }
+    #stage { margin:0; border:0; border-radius:0; }
+    #stage svg { min-width:0; }
+  }
+</style>
+</head>
+<body>
+<header class="bar">
+  <h1>CV Timeline</h1>
+  <label class="btn primary" for="file">Upload TSV…</label>
+  <input id="file" type="file" accept=".tsv,.txt,.csv,text/tab-separated-values,text/csv">
+  <button class="btn" id="tpl" type="button">Download current TSV</button>
+  <label class="inline" for="hdr">Header colour <input id="hdr" type="color" value="#12403C"></label>
+  <span class="spacer"></span>
+  <button class="btn" id="png" type="button">Save PNG</button>
+  <button class="btn" id="svgdl" type="button">Save SVG</button>
+  <button class="btn" id="print" type="button">Print / PDF</button>
+</header>
+<div id="drop">Drop a .tsv file here, or use <b>Upload TSV…</b> Columns: <code>category · label · org · start · end · color</code></div>
+<div id="msg"></div>
+<div id="stage"></div>
+
+<script>
+(() => {
+  // ---------- settings ----------
+  const W = 1600;
+  const FONT = "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif";
+  const FONT_CSS_URL = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap';
+  const PALETTE = ['#2A7F82', '#3D2C3E', '#D9902F', '#B9472F', '#1F3A5F', '#5B6B2E', '#7A3B69'];
+  const ROW = 34, BAR_H = 22, PLOT_X0 = 300, PLOT_X1 = W - 70, LANE_X = 40;
+  const now = new Date();
+  const NOW = now.getFullYear() + now.getMonth() / 12;
+
+  let rawText = '';
+  let headerColor = '#12403C';
+
+  // ---------- helpers ----------
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const ctx = document.createElement('canvas').getContext('2d');
+  const tw = (text, size, weight = 400) => { ctx.font = `${weight} ${size}px ${FONT}`; return ctx.measureText(text).width; };
+
+  function luminance(hex) {
+    const m = hex.replace('#', '').match(/.{2}/g); if (!m) return 0;
+    const [r, g, b] = m.map(h => { const c = parseInt(h, 16) / 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+  const textOn = hex => luminance(hex) > 0.35 ? '#2E1D05' : '#FFFFFF';
+  const darken = (hex, f = 0.7) => '#' + hex.replace('#', '').match(/.{2}/g).map(h => Math.round(parseInt(h, 16) * f).toString(16).padStart(2, '0')).join('');
+
+  function splitLine(line, delim) {
+    if (delim === '\t') return line.split('\t');
+    // minimal CSV with quotes
+    const out = []; let cur = '', q = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (q) { if (c === '"' && line[i + 1] === '"') { cur += '"'; i++; } else if (c === '"') q = false; else cur += c; }
+      else if (c === '"') q = true; else if (c === ',') { out.push(cur); cur = ''; } else cur += c;
+    }
+    out.push(cur); return out;
+  }
+
+  function parseDate(s, isEnd) {
+    s = (s || '').trim().toLowerCase();
+    if (!s) return null;
+    if (/^(present|now|ongoing|current|-)$/.test(s)) return { v: NOW, y: null, open: true };
+    const m = s.match(/^(\d{4})(?:[-\/.](\d{1,2}))?$/);
+    if (!m) return { bad: true };
+    const y = +m[1], mo = m[2] ? +m[2] : null;
+    if (mo !== null && (mo < 1 || mo > 12)) return { bad: true };
+    const v = mo ? y + (mo - 1) / 12 + (isEnd ? 1 / 12 : 0) : y + (isEnd ? 1 : 0);
+    return { v, y, open: false };
+  }
+
+  // ---------- parse ----------
+  function parse(text) {
+    const lines = text.replace(/^﻿/, '').split(/\r?\n/).filter(l => l.trim() && !l.trim().startsWith('#'));
+    if (!lines.length) throw new Error('The file is empty.');
+    const delim = lines[0].includes('\t') ? '\t' : ',';
+    const head = splitLine(lines[0], delim).map(h => h.trim().toLowerCase());
+    const col = n => head.indexOf(n);
+    for (const need of ['category', 'label']) if (col(need) < 0) throw new Error(`Missing column "${need}". The first row must be a header: category, label, org, start, end, color.`);
+    const get = (r, n) => col(n) >= 0 ? (r[col(n)] || '').trim() : '';
+
+    const meta = { title: 'CV Timeline', subtitle: '', metrics: [] };
+    const lanes = new Map(); const undated = new Map(); const warnings = [];
+
+    lines.slice(1).forEach((line, i) => {
+      const r = splitLine(line, delim), rowNo = i + 2;
+      const cat = get(r, 'category'), label = get(r, 'label'), org = get(r, 'org');
+      if (!cat && !label) return;
+      const c = cat.toLowerCase();
+      if (c === '_title') { meta.title = label; return; }
+      if (c === '_subtitle') { meta.subtitle = label; return; }
+      if (c === '_metric') { meta.metrics.push({ value: label, caption: org }); return; }
+      if (!cat) { warnings.push(`Row ${rowNo}: no category — skipped.`); return; }
+      const s = parseDate(get(r, 'start'), false);
+      let e = parseDate(get(r, 'end'), true);
+      if (s && s.bad) { warnings.push(`Row ${rowNo}: start "${get(r, 'start')}" isn't a year (YYYY or YYYY-MM) — skipped.`); return; }
+      if (e && e.bad) { warnings.push(`Row ${rowNo}: end "${get(r, 'end')}" isn't a year, YYYY-MM or "present" — skipped.`); return; }
+      const color = get(r, 'color');
+      if (!s) { if (!undated.has(cat)) undated.set(cat, []); undated.get(cat).push({ label, org }); return; }
+      if (!e) e = parseDate(get(r, 'start'), true);
+      if (e.v < s.v) warnings.push(`Row ${rowNo}: end is before start.`);
+      let txt;
+      if (e.open) txt = `${s.y}–`;
+      else if (e.y === s.y) txt = `${s.y}`;
+      else txt = Math.floor(s.y / 100) === Math.floor(e.y / 100) ? `${s.y}–${String(e.y).slice(2)}` : `${s.y}–${e.y}`;
+      if (!lanes.has(cat)) lanes.set(cat, { name: cat, items: [], color: '' });
+      const lane = lanes.get(cat);
+      if (color && /^#[0-9a-f]{6}$/i.test(color) && !lane.color) lane.color = color;
+      lane.items.push({ label, org, s: s.v, e: Math.max(e.v, s.v), txt, open: e.open, color: /^#[0-9a-f]{6}$/i.test(color) ? color : '' });
+    });
+
+    let k = 0;
+    for (const lane of lanes.values()) {
+      if (!lane.color) lane.color = PALETTE[k % PALETTE.length];
+      k++;
+      lane.items.sort((a, b) => a.s - b.s || a.e - b.e);
+    }
+    return { meta, lanes: [...lanes.values()], undated, warnings };
+  }
+
+  // ---------- render ----------
+  function render(data) {
+    const { meta, lanes, undated } = data;
+    const all = lanes.flatMap(l => l.items);
+    let y0 = Math.floor((all.length ? Math.min(...all.map(i => i.s)) : NOW - 10) / 5) * 5;
+    let y1 = Math.max(NOW + 0.6, ...all.map(i => i.e));
+    const X = v => PLOT_X0 + (v - y0) / (y1 - y0) * (PLOT_X1 - PLOT_X0);
+
+    const out = [];
+    // header
+    const HEAD = 130;
+    out.push(`<rect x="0" y="0" width="${W}" height="${HEAD}" fill="${headerColor}"/>`);
+    const hTxt = textOn(headerColor);
+    out.push(`<text x="40" y="${meta.subtitle ? 74 : 86}" font-size="40" font-weight="700" fill="${hTxt}">${esc(meta.title)}</text>`);
+    if (meta.subtitle) out.push(`<text x="40" y="104" font-size="16" fill="${hTxt}" opacity="0.9">${esc(meta.subtitle)}</text>`);
+    let mx = W - 40;
+    [...meta.metrics].reverse().forEach(m => {
+      const w = Math.max(tw(m.value, 28, 700), tw(m.caption, 12));
+      out.push(`<text x="${mx}" y="88" text-anchor="end" font-size="28" font-weight="700" fill="${hTxt}">${esc(m.value)}</text>`);
+      out.push(`<text x="${mx}" y="106" text-anchor="end" font-size="12" fill="${hTxt}" opacity="0.9">${esc(m.caption)}</text>`);
+      mx -= w + 32;
+    });
+
+    // lanes
+    let y = HEAD + 50;
+    const plotTop = y - 20;
+    const body = [];
+    lanes.forEach((lane, li) => {
+      if (li > 0) { body.push(`<line x1="${LANE_X}" x2="${W - 40}" y1="${y - 14}" y2="${y - 14}" stroke="#E3E6E9"/>`); }
+      body.push(`<circle cx="${LANE_X + 5}" cy="${y + BAR_H / 2}" r="5" fill="${lane.color}"/>`);
+      body.push(`<text x="${LANE_X + 18}" y="${y + 15}" font-size="11" font-weight="700" letter-spacing="1.3" fill="${darken(lane.color, 0.8)}">${esc(lane.name.toUpperCase())}</text>`);
+      lane.items.forEach(it => {
+        const col = it.color || lane.color, fg = textOn(col);
+        const bx = X(it.s);
+        const txtW = tw(it.txt, 11, 700) + 16;
+        const bw = Math.max(X(it.e) - bx, txtW);
+        body.push(`<rect x="${bx.toFixed(1)}" y="${y}" width="${bw.toFixed(1)}" height="${BAR_H}" rx="${BAR_H / 2}" fill="${col}"/>`);
+        body.push(`<text x="${(bx + 8).toFixed(1)}" y="${y + 15}" font-size="11" font-weight="700" fill="${fg}">${esc(it.txt)}</text>`);
+        const orgPart = it.org ? ` — ${it.org}` : '';
+        const lw = tw(it.label, 13) + (orgPart ? tw(orgPart, 13) : 0);
+        const rightRoom = W - 40 - (bx + bw + 12), leftRoom = bx - 12 - (PLOT_X0 - 20);
+        const right = lw <= rightRoom || rightRoom >= leftRoom;
+        const lx = right ? bx + bw + 12 : bx - 12;
+        body.push(`<text x="${lx.toFixed(1)}" y="${y + 16}" font-size="13" text-anchor="${right ? 'start' : 'end'}" fill="#1E2326">${esc(it.label)}${orgPart ? `<tspan fill="#5A6168">${esc(orgPart)}</tspan>` : ''}</text>`);
+        y += ROW;
+      });
+      y += 26;
+    });
+    const axisY = y;
+
+    // grid + axis (drawn under bars)
+    const grid = [];
+    for (let yr = y0; yr <= y1; yr += 5) {
+      const x = X(yr).toFixed(1);
+      if (yr > y0) grid.push(`<line x1="${x}" x2="${x}" y1="${plotTop}" y2="${axisY}" stroke="#ECEEF0"/>`);
+      grid.push(`<line x1="${x}" x2="${x}" y1="${axisY}" y2="${axisY + 12}" stroke="#1E2326" stroke-width="2"/>`);
+      grid.push(`<text x="${x}" y="${axisY + 32}" text-anchor="middle" font-size="14" font-weight="600" fill="#1E2326">${yr}</text>`);
+    }
+    grid.push(`<line x1="${X(y0)}" x2="${X(y1)}" y1="${axisY}" y2="${axisY}" stroke="#1E2326" stroke-width="2"/>`);
+    const nx = X(NOW).toFixed(1);
+    grid.push(`<line x1="${nx}" x2="${nx}" y1="${plotTop}" y2="${axisY}" stroke="#9AA1A8" stroke-width="2" stroke-dasharray="6 5"/>`);
+    grid.push(`<text x="${(+nx + 6)}" y="${plotTop + 4}" font-size="11" font-weight="700" letter-spacing="0.9" fill="#5A6168">NOW</text>`);
+    out.push(...grid, ...body);
+
+    // undated chips
+    y = axisY + 72;
+    for (const [cat, chips] of undated) {
+      out.push(`<text x="${LANE_X}" y="${y}" font-size="11" font-weight="700" letter-spacing="1.3" fill="#5A6168">${esc(cat.toUpperCase())}</text>`);
+      y += 14;
+      let cx = LANE_X;
+      chips.forEach(ch => {
+        const t = ch.org ? `${ch.label} — ${ch.org}` : ch.label;
+        const w = tw(t, 13) + 24;
+        if (cx + w > W - 40) { cx = LANE_X; y += 36; }
+        out.push(`<rect x="${cx.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="28" rx="14" fill="#F1F3F4"/>`);
+        out.push(`<text x="${(cx + 12).toFixed(1)}" y="${y + 18.5}" font-size="13" fill="#1E2326">${esc(t)}</text>`);
+        cx += w + 8;
+      });
+      y += 28 + 34;
+    }
+    const H = Math.ceil(y + 6);
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="${esc(FONT)}" role="img" aria-label="${esc(meta.title)}"><rect width="${W}" height="${H}" fill="#FFFFFF"/>${out.join('')}</svg>`;
+  }
+
+  // ---------- UI ----------
+  const stage = document.getElementById('stage'), msg = document.getElementById('msg');
+
+  function draw() {
+    try {
+      const data = parse(rawText);
+      stage.innerHTML = render(data);
+      if (data.warnings.length) { msg.className = 'err'; msg.innerHTML = 'Some rows need attention:<ul>' + data.warnings.map(w => `<li>${esc(w)}</li>`).join('') + '</ul>'; }
+      else { msg.className = ''; msg.textContent = ''; }
+    } catch (e) { msg.className = 'err'; msg.textContent = e.message; }
+  }
+
+  async function load(text) { rawText = text; await document.fonts.ready; draw(); }
+
+  document.getElementById('file').addEventListener('change', e => { const f = e.target.files[0]; if (f) f.text().then(load); e.target.value = ''; });
+  const drop = document.getElementById('drop');
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) f.text().then(load); });
+  document.getElementById('hdr').addEventListener('input', e => { headerColor = e.target.value; document.documentElement.style.setProperty('--accent', headerColor); draw(); });
+
+  function download(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
+  document.getElementById('tpl').addEventListener('click', () => download(new Blob([rawText], { type: 'text/tab-separated-values' }), 'cv.tsv'));
+  document.getElementById('print').addEventListener('click', () => window.print());
+
+  // Embed the web font so exported files look the same everywhere.
+  let fontCache = null;
+  async function embeddedFontCSS() {
+    if (fontCache !== null) return fontCache;
+    try {
+      const css = await (await fetch(FONT_CSS_URL)).text();
+      const blocks = [...css.matchAll(/\/\*\s*(latin|latin-ext)\s*\*\/\s*(@font-face\s*{[^}]*})/g)].map(m => m[2]);
+      const parts = await Promise.all(blocks.map(async b => {
+        const url = (b.match(/url\(([^)]+)\)/) || [])[1]; if (!url) return '';
+        const buf = await (await fetch(url)).arrayBuffer();
+        let bin = ''; new Uint8Array(buf).forEach(c => bin += String.fromCharCode(c));
+        return b.replace(url, `data:font/woff2;base64,${btoa(bin)}`);
+      }));
+      fontCache = parts.join('\n');
+    } catch (e) { fontCache = ''; }
+    return fontCache;
+  }
+  async function svgForExport() {
+    const svg = stage.querySelector('svg'); if (!svg) return null;
+    const css = await embeddedFontCSS();
+    return new XMLSerializer().serializeToString(svg).replace(/(<svg[^>]*>)/, `$1<style>${css}</style>`);
+  }
+  document.getElementById('svgdl').addEventListener('click', async () => { const s = await svgForExport(); if (s) download(new Blob([s], { type: 'image/svg+xml' }), 'cv-timeline.svg'); });
+  document.getElementById('png').addEventListener('click', async () => {
+    const s = await svgForExport(); if (!s) return;
+    const svg = stage.querySelector('svg'); const [, , w, h] = svg.getAttribute('viewBox').split(' ').map(Number);
+    const img = new Image();
+    img.onload = () => { const c = document.createElement('canvas'); c.width = w * 2; c.height = h * 2; const g = c.getContext('2d'); g.scale(2, 2); g.drawImage(img, 0, 0); c.toBlob(b => download(b, 'cv-timeline.png'), 'image/png'); };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s);
+  });
+
+  // Start with ?data=file.tsv, else cv.tsv next to this page.
+  const src = new URLSearchParams(location.search).get('data') || 'cv.tsv';
+  fetch(src).then(r => { if (!r.ok) throw 0; return r.text(); }).then(load)
+    .catch(() => { msg.className = ''; msg.textContent = 'Upload a TSV file to draw your timeline.'; });
+})();
+</script>
+</body>
+</html>

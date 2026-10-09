@@ -1,0 +1,31 @@
+# Example data for a fictional researcher. Replace with your own.
+category	label	org	start	end	color
+_title	Dr John Smith (example CV)
+_subtitle	Appointments, fellowships, leadership & service
+_metric	42	publications
+_metric	h 21	1,900+ citations
+_metric	$6.8M	competitive grants
+_metric	11	students supervised
+Education	BSc (Hons) Molecular Biology	Northbridge University	2001	2004
+Education	PhD in Microbial Genomics	Northbridge University	2005	2009
+Education	Graduate Certificate in Data Science	Eastvale Online Academy	2016-02	2017-06
+Appointments	Postdoctoral Research Associate	Lakeside Institute of Genetics	2009-10	2013-06
+Appointments	Research Fellow	Harbour Institute of Medical Research	2013-07	2019-12
+Appointments	Senior Research Fellow	Harbour Institute of Medical Research	2020	present
+Appointments	Adjunct Senior Lecturer	School of Biomedical Sciences, Northbridge University	2018	present
+Fellowships & Awards	Early Career Research Fellowship	National Science Fund	2012	2015
+Fellowships & Awards	Young Investigator Award	Society for Microbial Ecology	2016
+Fellowships & Awards	Mid-Career Research Fellowship	National Health Research Council	2021	2025
+Fellowships & Awards	Innovation Seed Grant	Westcoast Health Foundation	2024	2026
+Leadership & Governance	Treasurer	Society for Microbial Ecology	2014	2017
+Leadership & Governance	Head, Bioinformatics Platform	Harbour Institute of Medical Research	2019	present
+Leadership & Governance	Chair, Early Career Researcher Committee	Harbour Institute of Medical Research	2017	2020
+Leadership & Governance	Vice President	Society for Microbial Ecology	2022	present
+Committees	Member, Human Research Ethics Committee	Harbour Institute of Medical Research	2015	2021
+Committees	Member, Equity & Inclusion Working Group	Harbour Institute of Medical Research	2019	2023
+Committees	Grant Review Panel Member	National Science Fund	2022	2024
+Ongoing service	Editorial Board	Journal of Microbial Genomics
+Ongoing service	Associate Editor	Open Microbiology Reports
+Ongoing service	Peer reviewer	20+ journals
+Ongoing service	Workshop instructor	Reproducible bioinformatics
+Ongoing service	STEM outreach volunteer	Local schools programme
