@@ -139,20 +139,6 @@ If a row can't be read (for example a date written as `Feb 2018`), the page skip
 
 ---
 
-## Keeping several versions
-
-You can keep more than one data file in the repository and choose between them with `?data=` in the address:
-
-```
-https://<your-username>.github.io/cv-timeline/                         → cv.tsv (default)
-https://<your-username>.github.io/cv-timeline/?data=promotion.tsv      → promotion.tsv
-https://<your-username>.github.io/cv-timeline/?data=grant-2027.tsv     → grant-2027.tsv
-```
-
-This lets you keep, for example, a short version for a job talk and a detailed one for a promotion panel.
-
----
-
 ## Troubleshooting
 
 | Problem | Fix |
