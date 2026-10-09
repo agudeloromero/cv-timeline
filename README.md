@@ -95,6 +95,10 @@ The columns must be separated by **tab** characters. If you copy this example, c
 
 Lines beginning with `#` are ignored, so you can hide a row by putting `#` at its start without deleting it.
 
+This is what the example `cv.tsv` looks like when opened in Excel:
+
+![Example cv.tsv opened in Excel](spreadsheet-example.jpg)
+
 ### Saving as TSV
 
 - **Excel:** *File → Save As →* choose **Text (Tab delimited) (\*.txt)**. The page accepts `.txt`, so you can rename it to `.tsv` or leave it.
