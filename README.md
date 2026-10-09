@@ -6,7 +6,7 @@ Turn a simple spreadsheet of your career into a timeline of concurrent roles: on
 
 *The example data (`cv.tsv`) describes a fictional researcher, "Dr John Smith". All people, institutions and numbers in it are made up. Replace it with your own.*
 
-🌟 **Try it: [live page](https://agudeloromero.github.io/cv-timeline/)**🌟 Open the [live page](https://agudeloromero.github.io/cv-timeline/).
+🌟 **Try it: [live page](https://agudeloromero.github.io/cv-timeline/)**
 
 - 📄 Works from a plain spreadsheet file (.tsv or .csv) that you can edit in Excel or Google Sheets
 - 🔒 Runs entirely in your browser. Uploaded files are never sent to a server.
