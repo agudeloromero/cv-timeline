@@ -5,10 +5,10 @@ Turn a simple spreadsheet of your career into a timeline of concurrent roles: on
 ![Example CV timeline for a fictional researcher](screenshot.png)
 
 *The example data (`cv.tsv`) describes a fictional researcher, "Dr John Smith". All people, institutions and numbers in it are made up. Replace it with your own.*
- 
-🌟 Open the [live page](https://agudeloromero.github.io/cv-timeline/).
 
-- 📄 Works from a plain tab-separated (`.tsv`) file that you can edit in Excel or Google Sheets
+🌟 **Try it: [live page](https://agudeloromero.github.io/cv-timeline/)**🌟 Open the [live page](https://agudeloromero.github.io/cv-timeline/).
+
+- 📄 Works from a plain spreadsheet file (.tsv or .csv) that you can edit in Excel or Google Sheets
 - 🔒 Runs entirely in your browser. Uploaded files are never sent to a server.
 - 🖼️ Exports to PNG (high resolution), SVG (editable vector) and PDF
 - 🧰 No installation, build step or dependencies: it's a single `index.html`
@@ -30,10 +30,10 @@ Turn a simple spreadsheet of your career into a timeline of concurrent roles: on
 
 ## Quick start
 
-1. Open the live page.
+1. Open the [live page](https://agudeloromero.github.io/cv-timeline/).
 2. Click **Download current TSV** to get the example file.
 3. Open it in Excel or Google Sheets and replace the rows with your own roles.
-4. Save it as **tab-separated** (see [Saving as TSV](#saving-as-tsv)).
+4. Save it as **tab-separated** or **CSV UTF-8** (see [Saving as TSV](#saving-as-tsv)).
 5. Drag the file onto the page, or click **Upload TSV…**
 6. Click **Save PNG**, **Save SVG** or **Print / PDF** to export your timeline.
 
