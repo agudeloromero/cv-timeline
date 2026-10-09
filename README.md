@@ -5,8 +5,8 @@ Turn a simple spreadsheet of your career into a timeline of concurrent roles: on
 ![Example CV timeline for a fictional researcher](screenshot.png)
 
 *The example data (`cv.tsv`) describes a fictional researcher, "Dr John Smith". All people, institutions and numbers in it are made up. Replace it with your own.*
-
-**Live page:** https://agudeloromero.github.io/cv-timeline/
+ 
+🌟 Open the [live page](https://agudeloromero.github.io/cv-timeline/).
 
 - 📄 Works from a plain tab-separated (`.tsv`) file that you can edit in Excel or Google Sheets
 - 🔒 Runs entirely in your browser. Uploaded files are never sent to a server.
@@ -21,9 +21,10 @@ Turn a simple spreadsheet of your career into a timeline of concurrent roles: on
 2. [Publishing on GitHub Pages](#publishing-on-github-pages)
 3. [Preparing your TSV file](#preparing-your-tsv-file)
 4. [Using the page](#using-the-page)
-5. [Keeping several versions](#keeping-several-versions)
-6. [Troubleshooting](#troubleshooting)
-7. [Repository contents](#repository-contents)
+5. [Troubleshooting](#troubleshooting)
+6. [Repository contents](#repository-contents)
+7. [Questions & feedback](#questions--feedback)
+8. [License](#license)
 
 ---
 
@@ -36,7 +37,27 @@ Turn a simple spreadsheet of your career into a timeline of concurrent roles: on
 5. Drag the file onto the page, or click **Upload TSV…**
 6. Click **Save PNG**, **Save SVG** or **Print / PDF** to export your timeline.
 
-Uploading a file only changes what *you* see in your browser. To change what everyone sees at the public link, update `cv.tsv` in the repository (below).
+Uploading a file only changes what *you* see in your browser. To publish your own timeline with your data as the default, follow [Publishing on GitHub Pages](#publishing-on-github-pages).
+
+---
+
+## Publishing on GitHub Pages
+
+To host your own copy:
+
+1. Click **Fork** (top right of this repository) to copy it to your GitHub account.
+2. In your fork, go to **Settings → Pages**.
+3. Under **Build and deployment**, set **Source** to *Deploy from a branch*, choose branch **main** and folder **/ (root)**, then click **Save**.
+4. After one or two minutes your site is live at `https://<your-username>.github.io/cv-timeline/`.
+
+### Updating your timeline
+
+- **In the browser:** open `cv.tsv` in your repository, click the ✏️ pencil icon, make your changes and click **Commit changes**. It's usually easier to edit in a spreadsheet and re-upload.
+- **By replacing the file:** click **Add file → Upload files**, drop in your new `cv.tsv` (keep exactly that name) and commit.
+
+The live page updates within a minute or two. If you still see the old version, do a hard refresh (Ctrl + Shift + R on Windows, Cmd + Shift + R on Mac).
+
+> **Privacy note:** in a public repository, anyone can read `cv.tsv`. Only include what you would put on a public CV. Or keep the example as the default and upload your real file on the page each time, since it never leaves your browser.
 
 ---
 
@@ -117,7 +138,7 @@ This is what the example `cv.tsv` looks like when opened in Excel:
 
 ### Saving as TSV
 
-- **Excel:** *File → Save As →* choose **Text (Tab delimited) (\*.txt)**. The page accepts `.txt`, so you can rename it to `.tsv` or leave it.
+- **Excel:** *File → Save As →* choose **CSV UTF-8 (Comma delimited) (\*.csv)**. This keeps accents (é, ñ) and dashes intact. *Text (Tab delimited)* also works if your file has no accented characters.
 - **Google Sheets:** *File → Download →* **Tab-separated values (.tsv)**.
 - **LibreOffice Calc:** *File → Save As →* **Text CSV**, then set the field delimiter to `{Tab}`.
 - **Mac Numbers:** *File → Export To → CSV*. The page reads CSV too.
@@ -146,7 +167,7 @@ If a row can't be read (for example a date written as `Feb 2018`), the page skip
 | *"Missing column category"* | The first row must be the header. Check it says `category` and `label`, and that the file is tab-separated rather than space-separated. |
 | Everything appears in one lane, or nothing appears | The file was probably saved with commas or spaces in the wrong places. Re-save as tab-delimited. |
 | A row is skipped | Dates must be `2018` or `2018-02`, and end dates can also be `present`. The message above the timeline gives the row number. |
-| Accents or symbols look wrong (é, ñ, –) | Save the file as **UTF-8**. In Excel, choose *Unicode Text* or use Google Sheets. |
+| Accents or symbols look wrong (é, ñ, –) | Save the file as **UTF-8**. In Excel, use *CSV UTF-8 (Comma delimited)*; Google Sheets downloads are already UTF-8. |
 | A label overlaps a bar | Long labels are placed on whichever side of the bar has more room. Shorten the label or move detail into `org`. |
 | The live site still shows old data | Wait a couple of minutes after committing, then hard refresh (Ctrl/Cmd + Shift + R). |
 | Opening `index.html` by double-clicking shows no data | Browsers block a local page from reading `cv.tsv` directly. Use **Upload TSV…**, or view it through GitHub Pages. |
@@ -159,7 +180,9 @@ If a row can't be read (for example a date written as `Feb 2018`), the page skip
 |---|---|
 | `index.html` | The whole app: page, parser and timeline drawing |
 | `cv.tsv` | The data shown when the page opens (fictional example) |
-| `screenshot.png` | Image used in this README |
+| `screenshot.png` | Timeline image used in this README |
+| `cv.jpg` | Excel view of the example `cv.tsv`, used in this README |
+| `LICENSE` | MIT licence |
 | `README.md` | This guide |
 
 ---
@@ -171,7 +194,15 @@ Have a question, found a bug, or have an idea to make this better? I'd be happy 
 - 💬 **Open an issue:** [github.com/agudeloromero/cv-timeline/issues](https://github.com/agudeloromero/cv-timeline/issues/new). This is best for bugs and feature requests, because others can see and join the discussion.
 - ✉️ **Send me an email:** [p.agudeloromero@gmail.com](mailto:p.agudeloromero@gmail.com?subject=CV%20Timeline%20feedback)
 
-Suggestions for improvement are always welcome.
+Suggestions for improvement are always welcome. If this tool helped you, a ⭐ on the repository is much appreciated!
 
 Built with plain HTML, CSS and JavaScript. Fonts come from [IBM Plex Sans](https://fonts.google.com/specimen/IBM+Plex+Sans) via Google Fonts.
+
+---
+
+## License
+
+Released under the [MIT License](LICENSE). You're free to use, adapt and share it.
+
+Copyright (c) 2026 Patricia Agudelo-Romero
 
